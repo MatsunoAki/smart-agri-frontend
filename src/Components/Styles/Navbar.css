@@ -1,0 +1,9 @@
+.container {
+    color: white;
+}
+
+#logo {
+    width: 200px;
+    height: auto;
+    position: relative;
+}
