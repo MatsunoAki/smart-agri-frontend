@@ -1,7 +1,74 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'; 
+import React, { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
+import { getDatabase, ref, set } from 'firebase/database';
 
 const Register = () => {
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const { signup } = useAuth();
+    const navigate = useNavigate();
+    const database = getDatabase();
+
+    // Handle user registration and database entry
+    async function handleSubmit(e) {
+        e.preventDefault();
+
+        // Check if passwords match
+        if (password !== confirmPassword) {
+            return setError("Passwords do not match");
+        }
+
+        try {
+            setError('');
+            setLoading(true);
+
+            // Register user in Firebase Authentication
+            const userCredential = await signup(email, password);
+            const user = userCredential.user;
+            const userId = user.uid;
+
+            // Hardcoded Device ID (replace this with the actual ESP32's unique ID)
+            const deviceId = "ESP32_FARM_ABC123"; 
+
+            // Store user data with associated device
+            await set(ref(database, `users/${userId}`), {
+                username: username,
+                email: email,
+                createdAt: new Date().toISOString(),
+                devices: {
+                    [deviceId]: {
+                        name: "My Smart Irrigation Device",
+                        status: "online",
+                        addedAt: new Date().toISOString()
+                    }
+                }
+            });
+
+            // Store device information in a separate "devices" collection
+            await set(ref(database, `devices/${deviceId}`), {
+                userId: userId,
+                name: "My Smart Irrigation Device",
+                status: "online",
+                lastActive: new Date().toISOString()
+            });
+
+            // Add delay before navigating to login page
+            setTimeout(() => {
+                navigate('/login');
+            }, 1000);  // 1-second delay
+
+        } catch (error) {
+            setError('Failed to create account: ' + error.message);
+        }
+        setLoading(false);
+    }
+
     return (
         <div
             className="w-screen h-screen flex justify-center items-center bg-cover bg-center bg-fixed"
@@ -23,53 +90,65 @@ const Register = () => {
                 <p className="text-white pb-2">
                     Create an account to access the Smart Agri-irrigation
                 </p>
-                <form className="w-full">
+                
+                {error && <div className="text-red-500 mb-4 text-sm">{error}</div>}
+                
+                <form onSubmit={handleSubmit} className="w-full">
                     <div className="form-floating mb-3">
                         <input
                             type="text"
                             className="form-control bg-[#2a3e2c] text-white p-3 rounded mb-4 w-full"
-                            id="floatingUsername"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             placeholder="Username"
+                            required
                         />
                     </div>
                     <div className="form-floating mb-3">
                         <input
                             type="email"
                             className="form-control bg-[#2a3e2c] text-white p-3 rounded mb-4 w-full"
-                            id="floatingEmail"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             placeholder="Email address - name@example.com"
+                            required
                         />
                     </div>
                     <div className="form-floating mb-3">
                         <input
                             type="password"
                             className="form-control bg-[#2a3e2c] text-white p-3 rounded mb-4 w-full"
-                            id="floatingPassword"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             placeholder="Password"
+                            required
                         />
                     </div>
                     <div className="form-floating mb-3">
                         <input
                             type="password"
                             className="form-control bg-[#2a3e2c] text-white p-3 rounded mb-4 w-full"
-                            id="floatingConfirmPassword"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder="Confirm Password"
+                            required
                         />
                     </div>
                     <div className="flex justify-center pb-2">
                         <button
-                            type="button"
+                            type="submit"
+                            disabled={loading}
                             className="w-full px-6 py-2 bg-[#f5c066] text-[#364c38] rounded-full hover:bg-gray-100 transition-colors font-bold"
                         >
-                            Register
+                            {loading ? 'Creating Account...' : 'Register'}
                         </button>
                     </div>
                     <div className="text-center">
                         <p className="text-white">
                             Already a member?{' '}
-                            <a href="#" className="text-[#f5c066]" onClick={() => {window.location.href = "/login"; }}>
+                            <Link to="/login" className="text-[#f5c066]">
                                 Sign in
-                            </a>
+                            </Link>
                         </p>
                     </div>
                 </form>
