@@ -7,7 +7,7 @@ return (
     <div>
         <Navbar />
         <div className="flex">
-            <div className="bg-[#2a3e2c] w-64 h-screen p-5 flex flex-col">
+            <div className="bg-[#334b35] w-64 h-screen p-5 flex flex-col">
                 <nav className='flex flex-col space-y-2'>
                     <a href="#" className='text-white hover:bg-[#3a4e3c] p-2 rounded'onClick={() => {window.location.href = "/dashboard/home"; }}>Home</a>
                     <a href="#" className='text-white bg-[#3a4e3c] p-2 rounded'onClick={() => {window.location.href = "/dashboard/devices"; }}>Devices</a>
