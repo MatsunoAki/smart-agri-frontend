@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { getDatabase, ref, set } from 'firebase/database';
+import { getDatabase, ref, set, push } from 'firebase/database';
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -33,31 +33,6 @@ const Register = () => {
             const user = userCredential.user;
             const userId = user.uid;
 
-            // Hardcoded Device ID (replace this with the actual ESP32's unique ID)
-            const deviceId = "ESP32_FARM_ABC123"; 
-
-            // Store user data with associated device
-            await set(ref(database, `users/${userId}`), {
-                username: username,
-                email: email,
-                createdAt: new Date().toISOString(),
-                devices: {
-                    [deviceId]: {
-                        name: "My Smart Irrigation Device",
-                        status: "online",
-                        addedAt: new Date().toISOString()
-                    }
-                }
-            });
-
-            // Store device information in a separate "devices" collection
-            await set(ref(database, `devices/${deviceId}`), {
-                userId: userId,
-                name: "My Smart Irrigation Device",
-                status: "online",
-                lastActive: new Date().toISOString()
-            });
-
             // Add delay before navigating to login page
             setTimeout(() => {
                 navigate('/login');
@@ -85,7 +60,7 @@ const Register = () => {
                     />
                 </Link>
             </header>
-            <main className="relative z-20 w-80% max-w-sm p-10 bg-[#364c38] rounded-lg flex flex-col">
+            <main className="relative z-20 w-11/12 max-w-sm p-10 bg-[#334b35] rounded-lg flex flex-col">
                 <h1 className="text-white text-3xl pb-4">Register</h1>
                 <p className="text-white pb-2">
                     Create an account to access the Smart Agri-irrigation
@@ -97,7 +72,7 @@ const Register = () => {
                     <div className="form-floating mb-3">
                         <input
                             type="text"
-                            className="form-control bg-[#2a3e2c] text-white p-3 rounded mb-4 w-full"
+                            className="form-control bg-[#263c28] text-white p-3 rounded mb-4 w-full"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             placeholder="Username"
@@ -107,7 +82,7 @@ const Register = () => {
                     <div className="form-floating mb-3">
                         <input
                             type="email"
-                            className="form-control bg-[#2a3e2c] text-white p-3 rounded mb-4 w-full"
+                            className="form-control bg-[#263c28] text-white p-3 rounded mb-4 w-full"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="Email address - name@example.com"
@@ -117,7 +92,7 @@ const Register = () => {
                     <div className="form-floating mb-3">
                         <input
                             type="password"
-                            className="form-control bg-[#2a3e2c] text-white p-3 rounded mb-4 w-full"
+                            className="form-control bg-[#263c28] text-white p-3 rounded mb-4 w-full"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Password"
@@ -127,7 +102,7 @@ const Register = () => {
                     <div className="form-floating mb-3">
                         <input
                             type="password"
-                            className="form-control bg-[#2a3e2c] text-white p-3 rounded mb-4 w-full"
+                            className="form-control bg-[#263c28] text-white p-3 rounded mb-4 w-full"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder="Confirm Password"
@@ -138,7 +113,7 @@ const Register = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full px-6 py-2 bg-[#f5c066] text-[#364c38] rounded-full hover:bg-gray-100 transition-colors font-bold"
+                            className="w-full px-6 py-2 bg-[#f5c066] text-[#364c38] rounded-full hover:bg-gray-300 transition-colors font-bold"
                         >
                             {loading ? 'Creating Account...' : 'Register'}
                         </button>
@@ -158,3 +133,4 @@ const Register = () => {
 };
 
 export default Register;
+

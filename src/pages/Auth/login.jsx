@@ -38,7 +38,7 @@ export default function Login() {
                     />
                 </Link>
             </header>
-            <main className="relative z-20 w-11/12 max-w-sm p-10 bg-[#364c38] rounded-lg flex flex-col">
+            <main className="relative z-20 w-11/12 max-w-sm p-10 bg-[#334b35] rounded-lg flex flex-col">
                 <h1 className="text-white text-3xl pb-4">Sign in</h1>
                 <p className="text-white pb-2">Sign in to access the Smart Agri-irrigation</p>
                 
@@ -48,7 +48,7 @@ export default function Login() {
                     <div className="form-floating mb-3">
                         <input
                             type="email"
-                            className="form-control bg-[#2a3e2c] text-white p-3 rounded mb-4 w-full"
+                            className="form-control bg-[#263c28] text-white p-3 rounded mb-4 w-full"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="Email address - name@example.com"
@@ -58,7 +58,7 @@ export default function Login() {
                     <div className="form-floating">
                         <input
                             type="password"
-                            className="form-control bg-[#2a3e2c] text-white p-3 rounded mb-4 w-full"
+                            className="form-control bg-[#263c28] text-white p-3 rounded mb-4 w-full"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Password"
@@ -83,14 +83,14 @@ export default function Login() {
                             </div>
                         </div>
                         <div className="col">
-                            <a href="#!" className="text-[#f5c066]">Forgot password?</a>
+                            <a href="#!" className="text-[#F0BB62]">Forgot password?</a>
                         </div>
                     </div>
                     <div className="flex justify-center pb-2">
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full px-6 py-2 bg-[#f5c066] text-[#364c38] rounded-full hover:bg-gray-100 transition-colors font-bold"
+                            className="w-full px-6 py-2 bg-[#F0BB62] text-[#364c38] rounded-full hover:bg-gray-300 transition-colors font-bold"
                         >
                             {loading ? 'Signing in...' : 'Sign in'}
                         </button>
@@ -98,7 +98,7 @@ export default function Login() {
                     <div className="text-center">
                         <p className="text-white">
                             Not a member?{' '}
-                            <Link to="/register" className="text-[#f5c066]">
+                            <Link to="/register" className="text-[#F0BB62]">
                                 Register
                             </Link>
                         </p>
