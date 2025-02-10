@@ -13,7 +13,7 @@ const Navbar = () => {
 
     return (
         <div className="navbar">
-            <section className="navbar-section text-white bg-[#364c38]">
+            <section className="navbar-section text-white bg-[#334b35]">
                 <div className="container mx-auto">
                     <nav className="navbar-nav flex justify-between items-center mx-auto px-4 h-24">
                         <Link to="/" className="navbar-logo" onClick={() => {window.location.href = "/"; }}>
@@ -21,25 +21,25 @@ const Navbar = () => {
                         </Link>
                         <div className="hidden md:flex items-center justify-between flex-1 pl-8 b">
                             <ul className="flex space-x-4">
-                                <li className="navbar-link p-4 hover:text-[#90ee90] transition-colors">
+                                <li className="navbar-link p-4 hover:text-[#263c28] transition-colors">
                                     <a href="#">Home</a>
                                 </li>
-                                <li className="navbar-link p-4 hover:text-[#90ee90] transition-colors">
+                                <li className="navbar-link p-4 hover:text-[#263c28] transition-colors">
                                     <a href="#">About</a>
                                 </li>
-                                <li className="navbar-link p-4 hover:text-[#90ee90] transition-colors">
+                                <li className="navbar-link p-4 hover:text-[#263c28] transition-colors">
                                     <a href="#">Contact</a>
                                 </li>
                             </ul>
                             <ul className="flex space-x-4">
                                 <li className="navbar-link">
-                                    <a href="#" className="px-6 py-2 bg-[#90ee90] text-[#364c38] rounded-full hover:bg-[#7ed37e] transition-colors font-bold" 
+                                    <a href="#" className="px-6 py-2 bg-[#90ee90] text-[#334b35] rounded-full hover:bg-[#7ed37e] transition-colors font-bold" 
                                     onClick={() => {window.location.href = "/login"; }}>
                                         Login
                                     </a>
                                 </li>
                                 <li className="navbar-link">
-                                    <a href="#" className="px-6 py-2 bg-[#f5c066] text-[#364c38] rounded-full hover:bg-gray-100 transition-colors font-bold"
+                                    <a href="#" className="px-6 py-2 bg-[#f5c066] text-[#334b35] rounded-full hover:bg-gray-100 transition-colors font-bold"
                                     onClick={() => {window.location.href = "/register"; }}>
                                         Sign up
                                     </a>
@@ -72,13 +72,13 @@ const Navbar = () => {
                                     <a href="#" className="block p-4">Contact</a>
                                 </li>
                                 <li className="mt-4">
-                                    <a href="#" className="block p-4 bg-[#90ee90] text-[#364c38] rounded-full text-center font-bold hover:bg-[#7ed37e] transition-colors"
+                                    <a href="#" className="block p-4 bg-[#90ee90] text-[#362706] rounded-full text-center font-bold hover:bg-[#7ed37e] transition-colors"
                                     onClick={() => {window.location.href = "/login"; }}>
                                         Login
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" className="block p-4 bg-[#f5c066] text-[#364c38] rounded-full text-center font-bold hover:bg-gray-100 transition-colors"
+                                    <a href="#" className="block p-4 bg-[#f5c066] text-[#362706] rounded-full text-center font-bold hover:bg-gray-100 transition-colors"
                                     onClick={() => {window.location.href = "/register"; }}>
                                         Sign up
                                     </a>
