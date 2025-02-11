@@ -1,31 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Agri Irrigation - README</title>
-    <style>
-        body {
-            font-family: monospace;
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            padding: 20px;
-        }
-        h1, h2, h3 {
-            color: #4caf50;
-        }
-        pre {
-            background-color: #333;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
-        }
-        code {
-            color: #ffcc00;
-        }
-    </style>
-</head>
-<body>
+
 
 <h1>🌱 Smart Agri Irrigation</h1>
 <p>A smart irrigation system with a web-integrated platform for <strong>ESP32-based devices</strong>. 
