@@ -16,7 +16,7 @@ function ProtectedRedirect() {
 
 function App() {
   return (
-    <Router>
+    <Router basename="/">
       <AuthProvider>
         <Routes>
           {/* Redirect "/" to "/dashboard/home" if logged in */}
@@ -37,7 +37,7 @@ function App() {
           </Route>
 
           {/* Catch-all: Redirect unknown paths to Dashboard */}
-          <Route path="*" element={<Navigate to="/dashboard/home" />} />
+          <Route path="*" element={<Navigate to="/dashboard/home" replace />} />
         </Routes>
       </AuthProvider>
     </Router>
