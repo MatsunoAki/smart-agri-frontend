@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import "./App.css";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Home from "./pages/Home";
-import Login from "./pages/Auth/Login";
-import Register from "./pages/Auth/Register";
+import Login from "./pages/Auth/login";
+import Register from "./pages/Auth/register";
 import Dashboard from "./pages/dashboard/Dashboard";
 import DashboardHome from "./pages/dashboard/components/widgets/MonitoringData";
 import Devices from "./pages/dashboard/components/widgets/DeviceList";
