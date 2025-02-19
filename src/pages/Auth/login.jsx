@@ -1,15 +1,30 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { login } = useAuth();
     const navigate = useNavigate();
+
+    const loginUser = async (email, password) => {
+        try {
+            const auth = getAuth();
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            const token = await user.getIdToken();
+
+            localStorage.setItem("token", user.accessToken);;
+            console.log('User logged in successfully');
+        } catch (error) {
+            console.error('Error logging in user:', error);
+            throw error;
+        }
+    };
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -17,7 +32,7 @@ export default function Login() {
         try {
             setError('');
             setLoading(true);
-            await login(email, password);
+            await loginUser(email, password);
             navigate('/dashboard/home');
         } catch (error) {
             setError('Failed to sign in: ' + error.message);
@@ -108,3 +123,4 @@ export default function Login() {
         </div>
     );
 }
+
