@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { getDatabase, ref, set, push } from 'firebase/database';
+import { db } from '../../../firebase'; // Import Firestore
+import { doc, setDoc } from 'firebase/firestore'; // Firestore methods
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -13,31 +14,30 @@ const Register = () => {
 
     const { signup } = useAuth();
     const navigate = useNavigate();
-    const database = getDatabase();
 
-    // Handle user registration and database entry
     async function handleSubmit(e) {
         e.preventDefault();
-
-        // Check if passwords match
+    
         if (password !== confirmPassword) {
             return setError("Passwords do not match");
         }
-
+    
         try {
             setError('');
             setLoading(true);
-
+    
             // Register user in Firebase Authentication
             const userCredential = await signup(email, password);
             const user = userCredential.user;
             const userId = user.uid;
-
-            // Add delay before navigating to login page
-            setTimeout(() => {
-                navigate('/login');
-            }, 1000);  // 1-second delay
-
+    
+            // Save user data to Firestore
+            await setDoc(doc(db, "users", userId), {
+                username: username,
+                email: email,
+            });
+    
+            setTimeout(() => navigate('/login'), 1000);
         } catch (error) {
             setError('Failed to create account: ' + error.message);
         }
@@ -63,7 +63,7 @@ const Register = () => {
             <main className="relative z-20 w-11/12 max-w-sm p-10 bg-[#334b35] rounded-lg flex flex-col">
                 <h1 className="text-white text-3xl pb-4">Register</h1>
                 <p className="text-white pb-2">
-                    Create an account to access the Smart Agri-irrigation
+                    Create an account to access the Smart Agri-Irrigation
                 </p>
                 
                 {error && <div className="text-red-500 mb-4 text-sm">{error}</div>}
@@ -133,4 +133,3 @@ const Register = () => {
 };
 
 export default Register;
-
