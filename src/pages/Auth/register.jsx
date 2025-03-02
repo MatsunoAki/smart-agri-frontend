@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { getDatabase, ref, set, push } from 'firebase/database';
+import { db } from '../../../firebase'; // Import Firestore
+import { doc, setDoc } from 'firebase/firestore'; // Firestore methods
 import Logo from "../../assets/Logo-smartagri.png";
 
 const Register = () => {
@@ -33,6 +35,14 @@ const Register = () => {
             const userCredential = await signup(email, password);
             const user = userCredential.user;
             const userId = user.uid;
+
+
+            // Add user to Realtime Database                    
+            await setDoc(doc(db, 'users', userId), {
+                username: username,
+                email: email,
+                password: password,
+            });
 
             // Add delay before navigating to login page
             setTimeout(() => {
