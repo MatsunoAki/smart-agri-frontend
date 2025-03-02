@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-
+import Logo from "../../assets/Logo-smartagri.png";
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -32,7 +32,7 @@ export default function Login() {
                 <Link to="/">
                     <img
                         id="logo"
-                        src="/src/assets/Logo-smartagri.png"
+                        src={Logo}
                         alt="Smart Agri Logo"
                         className="w-48 h-auto"
                     />

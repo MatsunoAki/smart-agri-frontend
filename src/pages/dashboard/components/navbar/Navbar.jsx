@@ -1,4 +1,5 @@
 import React from 'react';
+import Logo from "../../../../assets/Logo-smartagri.png";
 import { useNavigate } from 'react-router-dom';
 import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 
@@ -14,7 +15,7 @@ const Navbar = () => {
                 <div className="container mx-auto text-white">
                     <nav className="navbar-nav flex justify-between items-center mx-auto px-4 h-24">
                         <div className="navbar-logo" onClick={handleLogoClick}> {/* Use the function */}
-                            <img id="logo" src="/src/assets/Logo-smartagri.png" alt="Smart Agri Logo" className="w-[200px] h-auto relative" />
+                            <img id="logo" src={Logo} alt="Smart Agri Logo" className="w-[200px] h-auto relative" />
                         </div>
                     </nav>
                 </div>

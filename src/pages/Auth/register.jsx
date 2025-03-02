@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { getDatabase, ref, set, push } from 'firebase/database';
+import Logo from "../../assets/Logo-smartagri.png";
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -54,7 +55,7 @@ const Register = () => {
                 <Link to="/" className="navbar-logo">
                     <img
                         id="logo"
-                        src="/src/assets/Logo-smartagri.png"
+                        src={Logo}
                         alt="Smart Agri Logo"
                         className="w-48 h-auto"
                     />

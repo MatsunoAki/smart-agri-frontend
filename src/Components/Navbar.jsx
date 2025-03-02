@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'; 
 import './Styles/Navbar.css';
+import Logo from "../assets/Logo-smartagri.png";
 import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 
 const Navbar = () => {
@@ -17,7 +18,7 @@ const Navbar = () => {
                 <div className="container mx-auto">
                     <nav className="navbar-nav flex justify-between items-center mx-auto px-4 h-24">
                         <Link to="/" className="navbar-logo" onClick={() => {window.location.href = "/"; }}>
-                        <img id="logo" src="/src/assets/Logo-smartagri.png" alt="Smart Agri Logo" />
+                        <img id="logo" src={Logo} alt="Smart Agri Logo" />
                         </Link>
                         <div className="hidden md:flex items-center justify-between flex-1 pl-8 b">
                             <ul className="flex space-x-4">
