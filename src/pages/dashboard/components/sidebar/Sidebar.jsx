@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { getAuth, signOut } from 'firebase/auth';
 import { ref, onValue } from 'firebase/database';
-import { database } from '../../../../../firebase'; // Adjust path if needed
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../../../../firebase'; // Adjust path if needed
 import { useAuth } from '../../../../contexts/AuthContext'; // Import AuthContext to get user ID
 import { IoMdMenu, IoMdClose } from "react-icons/io"; // Import icons
 
@@ -17,14 +18,22 @@ import { IoMdMenu, IoMdClose } from "react-icons/io"; // Import icons
   useEffect(() => {
     if (!user) return;
 
-    const userRef = ref(database, `users/${user.uid}/username`); // Get username from users/{userId}/username
-    const unsubscribe = onValue(userRef, (snapshot) => {
-      if (snapshot.exists()) {
-        setUsername(snapshot.val()); // Set username state
-      }
-    });
+    const fetchUsername = async () => {
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
 
-    return () => unsubscribe(); // Cleanup subscription
+        if (userSnap.exists()) {
+          setUsername(userSnap.data().username || "User");
+        } else {
+          console.warn("User document not found.");
+        }
+      } catch (error) {
+        console.error("Error fetching username:", error);
+      }
+    };
+
+    fetchUsername();
   }, [user]);
 
   const handleLogout = async () => {
