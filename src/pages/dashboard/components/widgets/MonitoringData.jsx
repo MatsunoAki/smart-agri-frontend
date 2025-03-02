@@ -1,6 +1,4 @@
-// TODO: 1. Add time drop for Schedule mode in Pump
-// TODO: 2. Configure ESP32 to communicate with the firebase for scheduled pump
-
+// This component handles the monitoring of device data including sensor readings and pump control
 import React, { useState, useEffect } from "react";
 import { ref, onValue, off, update } from "firebase/database";
 import { database } from "../../../../../firebase";
@@ -19,7 +17,10 @@ import { GiWaterDrop } from "react-icons/gi";
 import { MdPowerSettingsNew } from "react-icons/md";
 
 const MonitoringData = () => {
+  // User authentication context
   const { user } = useAuth();
+
+  // State to store devices, selected device, sensor data, and pump mode
   const [devices, setDevices] = useState([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState(null);
   const [sensorData, setSensorData] = useState(null);
@@ -27,8 +28,10 @@ const MonitoringData = () => {
   const [schedules, setSchedules] = useState([]); // State to manage schedules
   const [newSchedule, setNewSchedule] = useState(""); // State to manage new schedule input
 
+  // Available pump modes
   const pumpModes = ["Scheduled", "Manual", "Automatic"];
 
+  // Fetch devices associated with the user
   useEffect(() => {
     if (!user) return;
     const devicesRef = ref(database, "devices");
@@ -45,7 +48,7 @@ const MonitoringData = () => {
 
         setDevices(userDevices);
         if (userDevices.length > 0) {
-          setSelectedDeviceId(userDevices[0].id);
+          setSelectedDeviceId(userDevices[0].id); // Auto-select first device
         }
       } else {
         setDevices([]);
@@ -55,6 +58,7 @@ const MonitoringData = () => {
     return () => off(devicesRef);
   }, [user]);
 
+  // Fetch sensor data and pump mode for the selected device
   useEffect(() => {
     if (!selectedDeviceId) return;
     const sensorRef = ref(database, `sensor_data/${selectedDeviceId}/readings`);
@@ -71,7 +75,7 @@ const MonitoringData = () => {
           temperature: data.temperature || 0,
           humidity: data.humidity || 0,
           moisture: data.moisture || 0,
-          pumpStatus: data.pump_status || false,
+          pumpStatus: data.pumpStatus || false,
         });
       } else {
         setSensorData(null);
@@ -99,6 +103,7 @@ const MonitoringData = () => {
     };
   }, [selectedDeviceId]);
 
+  // Handle change of pump mode
   const handlePumpModeChange = () => {
     const currentIndex = pumpModes.indexOf(pumpMode);
     const nextMode = pumpModes[(currentIndex + 1) % pumpModes.length];
@@ -114,6 +119,7 @@ const MonitoringData = () => {
     }
   };
 
+  // Handle adding a new schedule
   const handleAddSchedule = () => {
     if (newSchedule.trim() === "") return;
 
@@ -305,4 +311,5 @@ const MonitoringData = () => {
     </div>
   );
 };
+
 export default MonitoringData;
