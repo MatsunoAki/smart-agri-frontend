@@ -1,18 +1,9 @@
-body {
-    background: url('./assets/index-background.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    box-sizing: border-box;
-    overflow: hidden; /* Remove quotes */
-    height: 100vh; /* Remove quotes */
-}
+
 
 body::before {
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: white;
 }
