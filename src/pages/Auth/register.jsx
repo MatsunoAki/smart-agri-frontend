@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { getDatabase, ref, set, push } from 'firebase/database';
-import { db } from '../../../firebase'; // Import Firestore
-import { doc, setDoc } from 'firebase/firestore'; // Firestore methods
+import { getDatabase } from 'firebase/database';
+import { db } from '../../../firebase';
+import { doc, setDoc } from 'firebase/firestore';
 import Logo from "../../assets/Logo-smartagri.png";
+import FarmBackground from "../../assets/farm-background.jpg"; // ✅ Import local image
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -18,11 +19,9 @@ const Register = () => {
     const navigate = useNavigate();
     const database = getDatabase();
 
-    // Handle user registration and database entry
     async function handleSubmit(e) {
         e.preventDefault();
 
-        // Check if passwords match
         if (password !== confirmPassword) {
             return setError("Passwords do not match");
         }
@@ -31,23 +30,19 @@ const Register = () => {
             setError('');
             setLoading(true);
 
-            // Register user in Firebase Authentication
             const userCredential = await signup(email, password);
             const user = userCredential.user;
             const userId = user.uid;
 
-
-            // Add user to Realtime Database                    
             await setDoc(doc(db, 'users', userId), {
-                username: username,
-                email: email,
-                password: password,
+                username,
+                email,
+                password
             });
 
-            // Add delay before navigating to login page
             setTimeout(() => {
                 navigate('/login');
-            }, 1000);  // 1-second delay
+            }, 1000);
 
         } catch (error) {
             setError('Failed to create account: ' + error.message);
@@ -58,90 +53,77 @@ const Register = () => {
     return (
         <div
             className="w-screen h-screen flex justify-center items-center bg-cover bg-center bg-fixed"
-            style={{ backgroundImage: "url('/public/assets/farm-background.jpg')" }}
+            style={{ backgroundImage: `url(${FarmBackground})` }}
         >
-            <div className="absolute inset-0 bg-black opacity-70 z-10"></div>
-            <header className="absolute top-2 left-2 z-30">
-                <Link to="/" className="navbar-logo">
-                    <img
-                        id="logo"
-                        src={Logo}
-                        alt="Smart Agri Logo"
-                        className="w-48 h-auto"
-                    />
+            {/* Dark overlay */}
+            <div className="absolute inset-0 bg-black/70 z-10"></div>
+
+            {/* Logo */}
+            <header className="absolute top-4 left-4 z-30">
+                <Link to="/">
+                    <img src={Logo} alt="Smart Agri Logo" className="w-40 md:w-48 h-auto drop-shadow-lg" />
                 </Link>
             </header>
-            <main className="relative z-20 w-11/12 max-w-sm p-10 bg-[#334b35] rounded-lg flex flex-col">
-                <h1 className="text-white text-3xl pb-4">Register</h1>
-                <p className="text-white pb-2">
-                    Create an account to access the Smart Agri-irrigation
-                </p>
-                
-                {error && <div className="text-red-500 mb-4 text-sm">{error}</div>}
-                
-                <form onSubmit={handleSubmit} className="w-full">
-                    <div className="form-floating mb-3">
-                        <input
-                            type="text"
-                            className="form-control bg-[#263c28] text-white p-3 rounded mb-4 w-full"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            placeholder="Username"
-                            required
-                        />
-                    </div>
-                    <div className="form-floating mb-3">
-                        <input
-                            type="email"
-                            className="form-control bg-[#263c28] text-white p-3 rounded mb-4 w-full"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Email address - name@example.com"
-                            required
-                        />
-                    </div>
-                    <div className="form-floating mb-3">
-                        <input
-                            type="password"
-                            className="form-control bg-[#263c28] text-white p-3 rounded mb-4 w-full"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Password"
-                            required
-                        />
-                    </div>
-                    <div className="form-floating mb-3">
-                        <input
-                            type="password"
-                            className="form-control bg-[#263c28] text-white p-3 rounded mb-4 w-full"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            placeholder="Confirm Password"
-                            required
-                        />
-                    </div>
-                    <div className="flex justify-center pb-2">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full px-6 py-2 bg-[#f5c066] text-[#364c38] rounded-full hover:bg-gray-300 transition-colors font-bold"
-                        >
-                            {loading ? 'Creating Account...' : 'Register'}
-                        </button>
-                    </div>
-                    <div className="text-center">
-                        <p className="text-white">
-                            Already a member?{' '}
-                            <Link to="/login" className="text-[#f5c066]">
-                                Sign in
-                            </Link>
-                        </p>
-                    </div>
+
+            {/* Form */}
+            <main className="relative z-20 w-11/12 max-w-md p-8 bg-[#334b35] rounded-2xl shadow-xl backdrop-blur-sm">
+                <h1 className="text-white text-3xl font-bold pb-2">Create Account</h1>
+                <p className="text-gray-200 pb-6">Join Smart Agri-Irrigation today</p>
+
+                {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <input
+                        type="text"
+                        className="bg-[#263c28] text-white p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#f5c066]"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Username"
+                        required
+                    />
+                    <input
+                        type="email"
+                        className="bg-[#263c28] text-white p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#f5c066]"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Email address - name@example.com"
+                        required
+                    />
+                    <input
+                        type="password"
+                        className="bg-[#263c28] text-white p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#f5c066]"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
+                        required
+                    />
+                    <input
+                        type="password"
+                        className="bg-[#263c28] text-white p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#f5c066]"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Confirm Password"
+                        required
+                    />
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full py-3 bg-[#f5c066] text-[#334b35] rounded-full font-bold hover:bg-[#e6ad48] transition duration-300"
+                    >
+                        {loading ? 'Creating Account...' : 'Register'}
+                    </button>
                 </form>
+
+                <p className="text-gray-200 text-center mt-6">
+                    Already have an account?{' '}
+                    <Link to="/login" className="text-[#f5c066] hover:underline">
+                        Sign in
+                    </Link>
+                </p>
             </main>
         </div>
     );
 };
 
 export default Register;
-

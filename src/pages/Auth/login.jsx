@@ -1,24 +1,25 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Logo from "../../assets/Logo-smartagri.png";
-export default function Login() {
+import FarmBackground from "../../assets/farm-background.jpg"; // ✅ local image import
+
+const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
     const { login } = useAuth();
     const navigate = useNavigate();
 
     async function handleSubmit(e) {
         e.preventDefault();
-
         try {
             setError('');
             setLoading(true);
             await login(email, password);
-            navigate('/dashboard/home');
+            navigate('/');
         } catch (error) {
             setError('Failed to sign in: ' + error.message);
         }
@@ -26,85 +27,63 @@ export default function Login() {
     }
 
     return (
-        <div className="w-screen h-screen flex justify-center items-center bg-cover bg-center bg-fixed">
-            <div className="absolute inset-0 bg-black opacity-70 z-10"></div>
-            <header className="absolute top-2 left-2 z-30">
+        <div
+            className="w-screen h-screen flex justify-center items-center bg-cover bg-center bg-fixed"
+            style={{ backgroundImage: `url(${FarmBackground})` }}
+        >
+            {/* Dark overlay */}
+            <div className="absolute inset-0 bg-black/70 z-10"></div>
+
+            {/* Logo */}
+            <header className="absolute top-4 left-4 z-30">
                 <Link to="/">
-                    <img
-                        id="logo"
-                        src={Logo}
-                        alt="Smart Agri Logo"
-                        className="w-48 h-auto"
-                    />
+                    <img src={Logo} alt="Smart Agri Logo" className="w-40 md:w-48 h-auto drop-shadow-lg" />
                 </Link>
             </header>
-            <main className="relative z-20 w-11/12 max-w-sm p-10 bg-[#334b35] rounded-lg flex flex-col">
-                <h1 className="text-white text-3xl pb-4">Sign in</h1>
-                <p className="text-white pb-2">Sign in to access the Smart Agri-irrigation</p>
-                
-                {error && <div className="text-red-500 mb-4">{error}</div>}
-                
-                <form onSubmit={handleSubmit} className="w-full">
-                    <div className="form-floating mb-3">
-                        <input
-                            type="email"
-                            className="form-control bg-[#263c28] text-white p-3 rounded mb-4 w-full"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Email address - name@example.com"
-                            required
-                        />
-                    </div>
-                    <div className="form-floating">
-                        <input
-                            type="password"
-                            className="form-control bg-[#263c28] text-white p-3 rounded mb-4 w-full"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Password"
-                            required
-                        />
-                    </div>
-                    <div className="row mb-4 flex justify-between">
-                        <div className="col d-flex justify-center">
-                            <div className="form-check">
-                                <input
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    id="form2Example31"
-                                    defaultChecked
-                                />
-                                <label
-                                    className="form-check-label text-white p-3"
-                                    htmlFor="form2Example31"
-                                >
-                                    Remember me
-                                </label>
-                            </div>
-                        </div>
-                        <div className="col">
-                            <a href="#!" className="text-[#F0BB62]">Forgot password?</a>
-                        </div>
-                    </div>
-                    <div className="flex justify-center pb-2">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full px-6 py-2 bg-[#F0BB62] text-[#364c38] rounded-full hover:bg-gray-300 transition-colors font-bold"
-                        >
-                            {loading ? 'Signing in...' : 'Sign in'}
-                        </button>
-                    </div>
-                    <div className="text-center">
-                        <p className="text-white">
-                            Not a member?{' '}
-                            <Link to="/register" className="text-[#F0BB62]">
-                                Register
-                            </Link>
-                        </p>
-                    </div>
+
+            {/* Form Card */}
+            <main className="relative z-20 w-11/12 max-w-md p-8 bg-[#334b35] rounded-2xl shadow-xl backdrop-blur-sm">
+                <h1 className="text-white text-3xl font-bold pb-2">Welcome Back</h1>
+                <p className="text-gray-200 pb-6">Sign in to your Smart Agri-Irrigation account</p>
+
+                {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <input
+                        type="email"
+                        className="bg-[#263c28] text-white p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#f5c066]"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Email address"
+                        required
+                    />
+                    <input
+                        type="password"
+                        className="bg-[#263c28] text-white p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-[#f5c066]"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
+                        required
+                    />
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full py-3 bg-[#f5c066] text-[#334b35] rounded-full font-bold hover:bg-[#e6ad48] transition duration-300"
+                    >
+                        {loading ? 'Signing In...' : 'Login'}
+                    </button>
                 </form>
+
+                <p className="text-gray-200 text-center mt-6">
+                    Don't have an account?{' '}
+                    <Link to="/register" className="text-[#f5c066] hover:underline">
+                        Register
+                    </Link>
+                </p>
             </main>
         </div>
     );
-}
+};
+
+export default Login;
