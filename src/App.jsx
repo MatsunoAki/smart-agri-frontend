@@ -9,6 +9,7 @@ import DashboardHome from "./pages/dashboard/components/widgets/MonitoringData";
 import Devices from "./pages/dashboard/components/widgets/DeviceList";
 import PrivateRoute from "./Components/PrivateRoute";
 
+
 function ProtectedRedirect() {
   const { user } = useAuth();
   return user ? <Navigate to="/dashboard/home" replace /> : <Home />;
