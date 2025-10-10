@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ref, onValue, off, update, push, remove, get, set } from "firebase/database";
+import { ref, onValue, off, update, push, remove, set } from "firebase/database";
 import { database } from "../../../../../firebase";
 import { useAuth } from "../../../../contexts/AuthContext";
 import {
@@ -22,69 +22,63 @@ const MonitoringData = () => {
   const [pumpMode, setPumpMode] = useState("AUTO");
   const [scheduleList, setScheduleList] = useState([]);
   const [newTime, setNewTime] = useState("");
-  const statusUnsubscribes = useRef({});
+  const statusListeners = useRef({});
 
-  // 🔹 Get user devices and status
+  // 🔹 Fetch user's devices and manage status listeners
   useEffect(() => {
     if (!user) return;
-    const devicesRef = ref(database, "devices");
 
+    const devicesRef = ref(database, "devices");
+    
     const unsubscribeDevices = onValue(devicesRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
         const userDevices = Object.keys(data)
-          .map((key) => ({
-            id: key,
-            ...data[key],
-            status: "loading",
-            lastActiveTimestamp: null,
-          }))
+          .map((key) => ({ id: key, ...data[key] }))
           .filter((device) => device.ownerUID === user.uid);
 
         setDevices(userDevices);
+
         if (userDevices.length > 0 && !selectedDeviceId)
           setSelectedDeviceId(userDevices[0].id);
 
         userDevices.forEach((device) => {
-          if (statusUnsubscribes.current[device.id])
-            statusUnsubscribes.current[device.id]();
+          const statusPath = `devices/${device.id}/status`;
+          
+          if (statusListeners.current[device.id]) {
+            statusListeners.current[device.id](); 
+          }
 
-          const statusRef = ref(database, `devices/${device.id}/status`);
-          statusUnsubscribes.current[device.id] = onValue(
-            statusRef,
+          statusListeners.current[device.id] = onValue(
+            ref(database, statusPath),
             (statusSnapshot) => {
               const statusData = statusSnapshot.val();
-              const lastActiveTime = statusData?.lastActive
-                ? new Date(statusData.lastActive).getTime()
-                : null;
-              const isOnline = lastActiveTime
-                ? Date.now() - lastActiveTime < 20000
-                : false;
-
-              setDevices((prev) =>
-                prev.map((d) =>
-                  d.id === device.id
-                    ? {
-                        ...d,
-                        status: isOnline ? "online" : "offline",
-                        lastActiveTimestamp: lastActiveTime,
-                      }
-                    : d
-                )
-              );
+              if (statusData?.lastActive) {
+                const lastActive = new Date(statusData.lastActive).getTime();
+                const isOnline = Date.now() - lastActive < 20000;
+                setDevices((prev) =>
+                  prev.map((d) =>
+                    d.id === device.id
+                      ? { ...d, status: isOnline ? "online" : "offline" }
+                      : d
+                  )
+                );
+              }
             }
           );
         });
-      } else setDevices([]);
+      } else {
+        setDevices([]);
+      }
     });
 
     return () => {
       unsubscribeDevices();
-      Object.values(statusUnsubscribes.current).forEach((fn) => fn && fn());
+      Object.values(statusListeners.current).forEach((unsubscribe) => unsubscribe && unsubscribe());
     };
   }, [user]);
 
-  // 🔹 Sensor data listener
+  // 🔹 Real-time sensor data listener
   useEffect(() => {
     if (!selectedDeviceId) {
       setSensorData(null);
@@ -93,51 +87,32 @@ const MonitoringData = () => {
     }
 
     const dataRef = ref(database, `devices/${selectedDeviceId}/sensorData`);
-    const unsubscribeSensorData = onValue(dataRef, (snapshot) => {
-      if (!snapshot.exists()) return;
-      const data = snapshot.val();
-      setSensorData(data);
-      setPumpMode(data.pumpMode || (data.autoPump ? "AUTO" : "MANUAL"));
-    });
-
-    return () => unsubscribeSensorData();
-  }, [selectedDeviceId]);
-
-  // 🔹 Fetch schedule from separate node
-  useEffect(() => {
-    if (!selectedDeviceId) return;
-    const scheduleRef = ref(database, `devices/${selectedDeviceId}/schedule`);
-
-    const unsubscribe = onValue(scheduleRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const times = Object.entries(data).map(([key, time]) => ({
-          key,
-          time,
-        }));
-        setScheduleList(times);
-      } else {
-        setScheduleList([]);
+    const unsubscribeSensor = onValue(dataRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        setSensorData(data);
+        setPumpMode(data.pumpMode || "AUTO");
       }
     });
 
-    return () => unsubscribe();
+    return () => unsubscribeSensor();
   }, [selectedDeviceId]);
 
-  // 🔹 Offline fallback checker
+  // 🔹 Real-time schedule listener
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setDevices((prev) =>
-        prev.map((device) => {
-          if (!device.lastActiveTimestamp)
-            return { ...device, status: "offline" };
-          const isOnline = Date.now() - device.lastActiveTimestamp < 20000;
-          return { ...device, status: isOnline ? "online" : "offline" };
-        })
-      );
-    }, 5000);
-    return () => clearInterval(intervalId);
-  }, []);
+    if (!selectedDeviceId) return;
+
+    const scheduleRef = ref(database, `devices/${selectedDeviceId}/schedule`);
+    const unsubscribeSchedule = onValue(scheduleRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const list = Object.entries(data).map(([key, time]) => ({ key, time }));
+        setScheduleList(list);
+      } else setScheduleList([]);
+    });
+
+    return () => unsubscribeSchedule();
+  }, [selectedDeviceId]);
 
   // 🔹 Manual pump toggle
   const handlePumpToggle = () => {
@@ -148,7 +123,7 @@ const MonitoringData = () => {
     });
   };
 
-  // 🔹 Mode toggle cycle: AUTO → MANUAL → SCHEDULED
+  // 🔹 Mode cycle
   const handleModeCycle = () => {
     if (!selectedDeviceId) return;
     const modes = ["AUTO", "MANUAL", "SCHEDULED"];
@@ -159,7 +134,7 @@ const MonitoringData = () => {
     });
   };
 
-  // 🔹 Add new schedule (to separate node)
+  // 🔹 Add schedule
   const handleAddSchedule = async () => {
     if (!newTime || !selectedDeviceId) return;
     const scheduleRef = ref(database, `devices/${selectedDeviceId}/schedule`);
@@ -168,11 +143,10 @@ const MonitoringData = () => {
     setNewTime("");
   };
 
-  // 🔹 Delete schedule (from separate node)
+  // 🔹 Delete schedule
   const handleDeleteSchedule = async (key) => {
     if (!selectedDeviceId) return;
-    const itemRef = ref(database, `devices/${selectedDeviceId}/schedule/${key}`);
-    await remove(itemRef);
+    await remove(ref(database, `devices/${selectedDeviceId}/schedule/${key}`));
   };
 
   const selectedDevice = devices.find((d) => d.id === selectedDeviceId);
@@ -182,11 +156,7 @@ const MonitoringData = () => {
     <div className="flex flex-col lg:flex-row gap-6 p-6 bg-[#f1f3f4] min-h-screen">
       {/* Sidebar */}
       <Card className="w-full lg:w-1/4 p-4 shadow-md bg-white">
-        <CardHeader
-          shadow={false}
-          floated={false}
-          className="text-lg font-semibold mb-4 bg-transparent p-0"
-        >
+        <CardHeader shadow={false} floated={false} className="text-lg font-semibold mb-4 bg-transparent p-0">
           Your Devices
         </CardHeader>
         <CardBody className="flex flex-col gap-3 p-0">
@@ -222,7 +192,7 @@ const MonitoringData = () => {
         </CardBody>
       </Card>
 
-      {/* Main Monitoring Panel */}
+      {/* Monitoring Panel */}
       <Card className="flex-1 p-6 bg-white shadow-lg rounded-xl">
         {selectedDevice ? (
           isOnline && sensorData ? (
@@ -231,7 +201,7 @@ const MonitoringData = () => {
                 Monitoring: {selectedDevice.name || selectedDevice.id}
               </Typography>
 
-              {/* Sensor Readings */}
+              {/* Sensor Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 {[
                   {
@@ -273,7 +243,7 @@ const MonitoringData = () => {
                 ))}
               </div>
 
-              {/* Pump Mode Section */}
+              {/* Pump Controls */}
               <div className="flex flex-col sm:flex-row gap-6">
                 <Card className="flex-1 p-4 bg-gray-50 shadow-md">
                   <Typography variant="h6" className="mb-2 font-semibold">
@@ -281,7 +251,7 @@ const MonitoringData = () => {
                   </Typography>
                   <Typography
                     variant="h5"
-                    className={`font-bold ${
+                    className={`font-bold capitalize ${
                       pumpMode === "AUTO"
                         ? "text-green-600"
                         : pumpMode === "MANUAL"
@@ -299,7 +269,6 @@ const MonitoringData = () => {
                   </Button>
                 </Card>
 
-                {/* Manual Pump Control */}
                 {pumpMode === "MANUAL" && (
                   <Card className="flex-1 p-4 bg-gray-50 shadow-md">
                     <Typography variant="h6" className="mb-2 font-semibold">
@@ -328,7 +297,6 @@ const MonitoringData = () => {
                   </Card>
                 )}
 
-                {/* Scheduled Pump Control */}
                 {pumpMode === "SCHEDULED" && (
                   <Card className="flex-1 p-4 bg-gray-50 shadow-md">
                     <Typography
@@ -342,17 +310,12 @@ const MonitoringData = () => {
                         type="time"
                         value={newTime}
                         onChange={(e) => setNewTime(e.target.value)}
-                        className="border rounded-lg p-2 w-full focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-green-500"
                       />
-                      <Button
-                        color="green"
-                        onClick={handleAddSchedule}
-                        className="whitespace-nowrap"
-                      >
+                      <Button color="green" onClick={handleAddSchedule}>
                         Add
                       </Button>
                     </div>
-
                     <div className="space-y-2">
                       {scheduleList.length > 0 ? (
                         scheduleList.map((item) => (
@@ -382,14 +345,14 @@ const MonitoringData = () => {
             </>
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <Typography variant="h5" color="blue-gray" className="font-semibold mb-2">
-                {selectedDevice.name || "Unnamed Device"}
+              <Typography variant="h5" className="font-semibold mb-2">
+                {selectedDevice?.name || "Unnamed Device"}
               </Typography>
               <Typography variant="h6" color="red">
                 Device is Offline
               </Typography>
               <Typography color="gray" className="mt-1">
-                No real-time data is available. Please check the device's connection.
+                Waiting for device heartbeat or connection.
               </Typography>
             </div>
           )
