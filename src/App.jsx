@@ -7,6 +7,7 @@ import Register from "./pages/Auth/register";
 import Dashboard from "./pages/dashboard/Dashboard";
 import DashboardHome from "./pages/dashboard/components/widgets/MonitoringData";
 import Devices from "./pages/dashboard/components/widgets/DeviceList";
+import ReportsDashboard from "./pages/dashboard/components/widgets/ReportsDashboard";
 import PrivateRoute from "./Components/PrivateRoute";
 
 
@@ -34,6 +35,7 @@ function App() {
               <Route index element={<Navigate to="/dashboard/home" replace />} />
               <Route path="home" element={<DashboardHome />} />
               <Route path="devices" element={<Devices />} />
+              <Route path="reports" element={<ReportsDashboard />} />
             </Route>
           </Route>
 
