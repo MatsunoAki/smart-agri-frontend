@@ -5,7 +5,7 @@ import { getDatabase, ref, onValue } from "firebase/database";
 import Navbar from "./components/navbar/Navbar";
 import Sidebar from "./components/sidebar/Sidebar";
 import MonitoringData from "../..//pages/dashboard/components/widgets/MonitoringData"; // Import the monitoring component
-
+import DeviceList from "../..//pages/dashboard/components/widgets/DeviceList"; // Import the device list component
 const Dashboard = () => {
   const { user } = useAuth();
   const [devices, setDevices] = useState([]);
@@ -44,9 +44,14 @@ const Dashboard = () => {
         <div className="flex-1 p-5 overflow-y-auto max-h-screen">
           {/* Pass Selected Device ID to MonitoringData */}
           {selectedDeviceId && <MonitoringData deviceId={selectedDeviceId} />}
+          
+          {/* Pass selectedDeviceId to ReportsDashboard */}
+          {selectedDeviceId && (
+            <ReportsDashboard selectedDeviceId={selectedDeviceId} />
+          )}
           {/* Renders Nested Routes */}
           <Outlet />
-        </div>
+        </div>    
       </div>
     </div>
   );
