@@ -1,0 +1,40 @@
+.phone-input-wrapper {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 0.5rem; /* rounded-lg */
+  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent; /* Placeholder for focus ring */
+}
+
+.phone-input-wrapper:focus-within {
+  outline: none;
+  border-color: #f5c066; 
+  box-shadow: 0 0 0 2px #f5c066;
+}
+
+.phone-input-control .PhoneInputInput {
+  background-color: transparent;
+  color: white;
+  padding: 0.75rem; /* p-3 */
+  border: none;
+  outline: none;
+  width: 100%;
+}
+
+.phone-input-control .PhoneInputInput::placeholder {
+  color: #9ca3af; /* text-gray-400 */
+}
+
+.phone-input-control .PhoneInputCountry {
+  background-color: transparent;
+  color: black;
+  padding-left: 0.75rem; /* pl-3 */
+}
+
+.phone-input-control .PhoneInputCountryIcon {
+  box-shadow: none; /* Remove default shadow */
+}
+
+.phone-input-control .PhoneInputCountrySelectArrow {
+  color: white;
+  opacity: 0.7;
+}
